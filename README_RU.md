@@ -1,3 +1,6 @@
+# [English version](README.md) 🇬🇧  
+*Click to switch to English.*
+
 # WebSocket Controls
 
 **WebSocket Controls** — это аддон-клиент для управления Яндекс Музыкой через протокол WebSocket.
