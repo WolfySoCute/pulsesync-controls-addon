@@ -1,0 +1,10 @@
+{
+  "image": "icon.png",
+  "banner": "banner.png",
+  "name": "WebSocket Controls",
+  "author": "WolfySoCute",
+  "description": "WebSocket клиент для управления Я.Музыкой",
+  "version": "1.0.0",
+  "css": "style.css",
+  "script": "script.js"
+}
