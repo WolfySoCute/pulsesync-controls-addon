@@ -160,6 +160,66 @@ class Theme {
 
 let socket;
 const theme = new Theme('WebSocket-Controls');
+let volumeNode = document.querySelector('input[data-test-id="CHANGE_VOLUME_SLIDER"]');
+
+function changeVolume(volume) {
+    const lastValue = volumeNode.value;
+    volumeNode.value = volume;
+
+    const inputEvent = new Event("input", { bubbles: true });
+    const tracker = volumeNode._valueTracker;
+    if (tracker) tracker.setValue(lastValue);
+    volumeNode.dispatchEvent(inputEvent);
+}
+
+const eventHandlers = {
+    'READY': () => {
+        console.log('Клиент готов к работе!')
+    }
+};
+
+const commandHandlers = {
+    'DISPATCH': ({ evt, data }) => {
+        if (eventHandlers[evt]) {
+            eventHandlers[evt](data);
+        } else {
+            console.error('От сервера получен неизвестный ивент! Возможно стоит обновить плагин или тему!');
+        }
+    },
+
+    'CHANGE_SONG': ({ data }) => {
+        if (data?.direction === 'FORWARD') {
+            window.player.moveForward();
+        }
+        
+        else if (data?.direction === 'BACKWARD') {
+            window.player.moveBackward();
+        }
+    },
+
+    'PAUSE': () => {
+        window.player.togglePause();
+    },
+
+    'CHANGE_VOLUME': ({ data }) => {
+        volumeNode = document.querySelector('input[data-test-id="CHANGE_VOLUME_SLIDER"]');
+        let volume = 0;
+
+        if (data?.action === 'SET') {
+            volume = Number(data?.value) / 100;
+        }
+        
+        else if (data?.action === 'INCREASE') {
+            volume = Number(volumeNode.value) + (Number(data?.value) / 100);
+        }
+
+        else if (data?.action === 'DECREASE') {
+            volume = Number(volumeNode.value) - (Number(data?.value) / 100);
+        }
+
+        changeVolume(Math.min(1, Math.max(0, volume)));
+    }
+};
 
 theme.addAction('websocket.port', (settingsManager, hasChanged, styles) => {
     const setting = settingsManager.getSetting('websocket.port');
@@ -181,12 +241,11 @@ theme.addAction('websocket.port', (settingsManager, hasChanged, styles) => {
 
 		const message = JSON.parse(event.data);
 		
-		if (message.type == 'connected') console.log(message.data);
-		else if (message.type == 'forward') window.player.moveForward();
-		else if (message.type == 'backward') window.player.moveBackward();
-		else if (message.type == 'pause') window.player.togglePause();
-		else if (message.type == 'volume-down') window.player.decreaseVolume(Number(message.data) / 100 || 0.05);
-		else if (message.type == 'volume-up') window.player.increaseVolume(Number(message.data) / 100 || 0.05);
+        if (commandHandlers[message.cmd]) {
+            commandHandlers[message.cmd](message);
+        } else {
+            console.error('От сервера получена неизвестная команда! Возможно стоит обновить плагин или тему!');
+        }
 	});
 	
 	socket.addEventListener('error', (error) => {
@@ -195,5 +254,3 @@ theme.addAction('websocket.port', (settingsManager, hasChanged, styles) => {
 });
 
 theme.start(5000);
-
-
