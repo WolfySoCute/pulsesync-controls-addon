@@ -17,26 +17,86 @@ You can integrate WebSocket Controls with other programs that support WebSocket.
 
 ## For Developers
 When working with WebSocket, JSON messages of the following format are used:
+
 ```json
 {
-  "type": "Action type",
-  "data": "Additional information"
+  "cmd": "Command",
+  "data": {}, // Additional information for the command
+  "evt": "Event"
 }
 ```
 
-### Available Message Types:
-- `{ type: "connected", data: "Welcome message to the client" }`  
-  Sends a message confirming successful connection. Optional.
-- `{ type: "forward" }`  
-  Skips to the next track.
-- `{ type: "backward" }`  
-  Skips to the previous track.
-- `{ type: "pause" }`  
-  Pauses playback.
-- `{ type: "volume-down", data: "5" }`  
-  Decreases volume by the specified value (in percentage).
-- `{ type: "volume-up", data: "5" }`  
-  Increases volume by the specified value (in percentage).
+## Available Commands:
+
+### `DISPATCH`
+Trigger an event.
+
+**Example:**
+```json
+{ 
+  "cmd": "DISPATCH", 
+  "evt": "READY"
+}
+```
+
+### `CHANGE_SONG`
+Change the track.
+
+**Parameters:**
+- `direction` — direction of track change. Possible values: `FORWARD` or  `BACKWARD`.
+
+**Example:**
+```json
+{ 
+  "cmd": "CHANGE_SONG", 
+  "data": { 
+    "direction": "FORWARD" 
+  } 
+}
+```
+
+### `PAUSE`
+Pause the track.
+
+**Example:**
+```json
+{ 
+  "cmd": "PAUSE", 
+  "data": {} 
+}
+```
+
+### `CHANGE_VOLUME`
+Change the volume.
+
+**Parameters:**
+- `action` — type of volume change. Possible values: `SET`, `INCREASE` or `DECREASE`.
+- `value` — change value (in percentage).
+
+**Example:**
+```json
+{ 
+  "cmd": "CHANGE_VOLUME", 
+  "data": { 
+    "action": "SET", 
+    "value": 5 
+  } 
+}
+```
+
+## Available Events:
+
+### `READY`
+Successful connection and readiness to operate.
+
+**Example:**
+```json
+{ 
+  "cmd": "DISPATCH", 
+  "evt": "READY", 
+  "data": {} 
+}
+```
 
 ## Thank You
 A big thank you to the **PulseSync team** for creating an excellent program for customizing Yandex.Music themes!  
