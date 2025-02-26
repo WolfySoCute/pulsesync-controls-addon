@@ -72,6 +72,7 @@ Change the volume.
 **Parameters:**
 - `action` — type of volume change. Possible values: `SET`, `INCREASE` or `DECREASE`.
 - `value` — change value (in percentage).
+- `isSmoothly` — Smooth volume change (true/false).
 
 **Example:**
 ```json
@@ -79,7 +80,8 @@ Change the volume.
   "cmd": "CHANGE_VOLUME", 
   "data": { 
     "action": "SET", 
-    "value": 5 
+    "value": 5,
+    "isSmoothly": true
   } 
 }
 ```
