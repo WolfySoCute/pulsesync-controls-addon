@@ -162,14 +162,44 @@ let socket;
 const theme = new Theme('WebSocket-Controls');
 let volumeNode = document.querySelector('input[data-test-id="CHANGE_VOLUME_SLIDER"]');
 
-function changeVolume(volume) {
-    const lastValue = volumeNode.value;
-    volumeNode.value = volume;
+function changeVolume(volume, isSmoothly) {
+    const startValue = parseFloat(volumeNode.value);
+    volume = parseFloat(volume);
 
-    const inputEvent = new Event("input", { bubbles: true });
-    const tracker = volumeNode._valueTracker;
-    if (tracker) tracker.setValue(lastValue);
-    volumeNode.dispatchEvent(inputEvent);
+    if (isSmoothly) {
+        const steps = 50;
+        const stepDuration = 10;
+        const stepSize = (volume - startValue) / steps;
+        let currentStep = 0;
+
+        const smoothInterval = setInterval(() => {
+            currentStep++;
+            const newValue = startValue + (stepSize * currentStep);
+            const lastValue = volumeNode.value;
+            volumeNode.value = newValue;
+
+            const inputEvent = new Event("input", { bubbles: true });
+            const tracker = volumeNode._valueTracker;
+            if (tracker) tracker.setValue(lastValue); 
+            volumeNode.dispatchEvent(inputEvent);
+
+            if (currentStep >= steps) {
+                clearInterval(smoothInterval);
+                volumeNode.value = volume;
+                const finalInputEvent = new Event("input", { bubbles: true });
+                const finalTracker = volumeNode._valueTracker;
+                if (finalTracker) finalTracker.setValue(lastValue);
+                volumeNode.dispatchEvent(finalInputEvent);
+            }
+        }, stepDuration);
+    } else {
+        volumeNode.value = volume;
+
+        const inputEvent = new Event("input", { bubbles: true });
+        const tracker = volumeNode._valueTracker;
+        if (tracker) tracker.setValue(startValue);
+        volumeNode.dispatchEvent(inputEvent);
+    }
 }
 
 const eventHandlers = {
@@ -217,7 +247,7 @@ const commandHandlers = {
             volume = Number(volumeNode.value) - (Number(data?.value) / 100);
         }
 
-        changeVolume(Math.min(1, Math.max(0, volume)));
+        changeVolume(Math.min(1, Math.max(0, volume)), data?.isSmoothly ? true : false);
     }
 };
 
@@ -238,7 +268,7 @@ theme.addAction('websocket.port', (settingsManager, hasChanged, styles) => {
 	
 	socket.addEventListener('message', (event) => {
 		console.log(`Получено от сервера: ${event.data}`);
-
+        
 		const message = JSON.parse(event.data);
 		
         if (commandHandlers[message.cmd]) {
