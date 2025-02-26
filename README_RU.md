@@ -79,6 +79,7 @@
 **Параметры:**
 - `action` — тип смены громкости. Возможные значения: `SET`, `INCREASE` или `DECREASE`.
 - `value` — значение изменения (в процентах).
+- `isSmoothly` — Плавное изменение громкости (true/false).
 
 **Пример:**
 ```json
@@ -86,7 +87,8 @@
   "cmd": "CHANGE_VOLUME", 
   "data": { 
     "action": "SET", 
-    "value": 5 
+    "value": 5,
+    "isSmoothly": true
   } 
 }
 ```
