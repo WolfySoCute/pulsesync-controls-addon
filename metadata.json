@@ -4,7 +4,8 @@
   "name": "WebSocket Controls",
   "author": "WolfySoCute",
   "description": "WebSocket клиент для управления Я.Музыкой",
-  "version": "1.2.0",
+  "version": "1.2.1",
+  "type": "script",
   "css": "style.css",
   "script": "script.js"
 }

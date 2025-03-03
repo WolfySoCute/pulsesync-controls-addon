@@ -1,7 +1,7 @@
 /*
     КЛАССЫ ДЛЯ УПРОЩЕНИЯ РАБОТЫ С ТЕМОЙ
     Автор: WolfySoCute
-    Версия: 1.0.0
+    Версия: 1.0.1
 */
 
 class StylesManager {
@@ -23,14 +23,15 @@ class StylesManager {
 }
 
 class SettingsManager {
-    constructor() {
+    constructor(id) {
         this.settings = {};
         this.old_settings = {};
+        this.id = id;
     }
 
     async update() {
         try {
-            const response = await fetch('http://localhost:2007/get_handle');
+            const response = await fetch(`http://localhost:2007/get_handle?name=${this.id}`);
             if (!response.ok) throw new Error(`Ошибка сети: ${response.status}`);
 
             const { data } = await response.json();
@@ -110,7 +111,7 @@ class Theme {
         this.id = id;
         this.actions = {};
         this.stylesManager = new StylesManager();
-        this.settingsManager = new SettingsManager();
+        this.settingsManager = new SettingsManager(this.id);
     }
 
     applyTheme() {
@@ -159,7 +160,7 @@ class Theme {
 /* НАЧАЛО ТЕМЫ */
 
 let socket;
-const theme = new Theme('WebSocket-Controls');
+const theme = new Theme('WebSocket Controls');
 let volumeNode = document.querySelector('input[data-test-id="CHANGE_VOLUME_SLIDER"]');
 
 function changeVolume(volume, isSmoothly) {
